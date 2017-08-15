@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId            : '349839645446838',
+      autoLogAppEvents : true,
+      xfbml            : true,
+      version          : 'v2.10'
+    });
+    FB.AppEvents.logPageView();
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+</head>
+<body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script>
+function myFacebookLogin() {
+  FB.login(function(response){
+    console.log(response)
+    var userId
+    var userToken = response.authResponse.accessToken
+    console.log('user token ' + userToken)
+
+    FB.api('/me', {fields: ['first_name', 'last_name', 'id']}, function(response) {
+        var e = document.getElementById('user');
+        e.innerHTML = response.first_name + ' ' + response.last_name + '(' + response.id + ')'
+        e.innerHTML = e.innerHTML + '<br/>access token: ' + userToken + '<br/>'
+        e.innerHTML = e.innerHTML + '<button onclick="postShortLivedToken(\''+userToken+'\', \''+response.id+'\')">Post token</button>'
+    });
+
+    FB.api('/me/accounts', function(response) {
+        response.data.map(page => {
+          var e = document.getElementById('user-pages');
+          e.innerHTML = e.innerHTML + page.name + ' (' + page.id + ')'
+        })
+        console.log(response)
+    });
+  },
+  { scope: 'read_page_mailboxes',
+    return_scopes: true,
+    enable_profile_selector: true
+  });
+}
+
+function postShortLivedToken(token, userId){
+  $.ajax({
+    type: "POST",
+    url: '/access_token',
+    data: {'token': token, 'userId': userId},
+    success: function(response){
+      console.log(response)
+    },
+    dataType: 'text'
+  });
+}
+</script>
+<button onclick="myFacebookLogin()">Login with Facebook</button>
+
+<div>
+Facebook user:
+  <div id="user">
+  </div>
+<div>
+
+<br/>
+<br/>
+
+<div>
+User pages:
+  <div id="user-pages">
+  </div>
+</div>
+
+</body>
+</html>
