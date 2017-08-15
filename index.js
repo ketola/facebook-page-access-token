@@ -33,7 +33,15 @@ app.post('/access_token', function (req, res) {
           console.log('****************** Eternal token: **************')
           console.log(eternalToken)
           console.log('************************************************')
-          res.send('Great success')
+
+          // read something using the token
+          var conversationUrl = 'https://graph.facebook.com/v2.10/t_mid.$cAAVNMMRYjEVkFx6AsFd5dk3Z-otq/messages?access_token='+eternalToken+'&debug=all&fields=message%2Ccreated_time%2Cto%2Cfrom&format=json&method=get&pretty=0&suppress_http_code=1'
+          request.get(conversationUrl,
+            function(error, response, body){
+              console.log(body)
+              res.send('Great success')
+            }
+          )
         }
       )
     }
